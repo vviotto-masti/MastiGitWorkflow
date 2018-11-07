@@ -1,0 +1,225 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Git Workflow and Commands</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gitgraph.js/1.12.0/gitgraph.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/gitgraph.js/1.12.0/gitgraph.min.css"
+    />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+        crossorigin="anonymous">
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col">
+
+                <div style="width: 100%; text-align: center">
+                    <h1>Masti Git Workflow</h1>
+                </div>
+
+                <div style="width: 100%; text-align: center">
+                    <canvas id="gitGraph"></canvas>
+                </div>
+
+                <h2>Master Branch</h2>
+                <p>
+                    Master é eterno e serve apenas para guardar a ultima versão estável do software.
+                </p>
+
+                <h2>Develop Branch</h2>
+                <p>
+                    Develop é eterno e serve para guardar a versão em desenvolvimento do software, todas as mudanças que não estão no master
+                    devem estar neste branch
+                </p>
+
+                <h2>Feature Branch</h2>
+                <p>
+                    Feature é um branch de vida curta, deve ser usado sempre que se começar o desenvolvimento de alguma funcionalidade nova,
+                    este branch se cria a partir do "Develop" e possui nomenclatura seguindo o padrão "feature/nome-da-funcionalidade".
+                    Terminando-se o desenvolvimento deste funcionalidade, o branch deve ser integrado novamente no "Develop"
+                </p>
+
+                <h5>Para criar o branch utilize:</h5>
+                <ul>
+                    <li>git checkout -b feature/my-feature develop</li>
+                </ul>
+
+                <h5>Para finalizar o branch utilize:</h5>
+                <ul>
+                    <li>git checkout develop</li>
+                    <li>git merge --no-ff feature/my-feature</li>
+                    <li>git push origin develop</li>
+                    <li>git branch -d feature/my-feature</li>
+                </ul>
+
+                <h5>Para remover o branch remoto:</h5>
+                <ul>
+                    <li>git push origin :feature/my-feature</li>
+                </ul>
+
+                <h2>Release Branch</h2>
+                <p>
+                    Release é um branch de vida curta e deve ser usado para preparar uma versão para ser lançada, se cria a partir do develop,
+                    num ponto onde a versão esteja com as funcionalidades planejadas para o release e não na ponta do branch(a
+                    não ser que a ponta seja a versão planejada para o release). Possui nomenclatura seguindo o padrão "release/número-da-versão",
+                    este branch após finalizado deve ser integrado novamente no "Develop" e no "Master".
+                </p>
+
+                <h5>Para criar o branch utilize:</h5>
+                <ul>
+                    <li>git checkout -b release/2.3.0 hash-do-commit</li>
+                </ul>
+
+                <h5>Para finalizar o branch utilize:</h5>
+                <ul>
+                    <li>git checkout release/2.3.0</li>
+                    <li>git tag 2.3.0</li>
+                    <li>git checkout develop</li>
+                    <li>git merge release/2.3.0</li>
+                    <li>git push --tags origin develop</li>
+                    <li>git branch -d release/2.3.0</li>
+                    <li>git checkout master</li>
+                    <li>git merge --ff-only 2.3.0</li>
+                    <li>git push --tags origin master</li>
+                </ul>
+
+                <h5>Para remover o branch remoto:</h5>
+                <ul>
+                    <li>git push origin :release/2.3.0</li>
+                </ul>
+
+                <h2>Hotfix Branch</h2>
+                <p>
+                    Hotfix é um branch de vida curta bem parecido com o "Release", utilizado para corrigir algum bug no código de produção, deve
+                    ser criado a partir da ultima versão do master e segue nomenclatura padrão "hotfix/número-da-versão".
+                    Finalizando este branch deve-se ser integrado novamente no "Master" e no "Develop", caso exista um branch
+                    de "Release" atualmente ativo, deve-se integrar o hotfix ao branch de "Release" ao invés do "Develop"
+                </p>
+
+                <h5>Para criar o branch utilize:</h5>
+                <ul>
+                    <li>git checkout -b hotfix/2.3.1 master</li>
+                </ul>
+
+                <h5>Para finalizar o branch utilize:</h5>
+                <ul>
+                    <li>git checkout hotfix/2.3.1</li>
+                    <li>git tag 2.3.1</li>
+                    <li>git checkout develop(ou release)</li>
+                    <li>git merge hotfix/2.3.1</li>
+                    <li>git push --tags origin develop(ou release)</li>
+                    <li>git branch -d hotfix/2.3.1</li>
+                    <li>git checkout master</li>
+                    <li>git merge --ff-only 2.3.1</li>
+                    <li>git push --tags origin master</li>
+                </ul>
+
+                <h5>Para remover o branch remoto:</h5>
+                <ul>
+                    <li>git push origin :hotfix/2.3.1</li>
+                </ul>
+
+                <h2>Outros comandos</h2>
+
+                <h5>Para enviar um branch que só existe localmente para o repositório remoto utilize:</h5>
+                <ul>
+                    <li>git push -u origin branch_name</li>
+                </ul>
+
+                <h5>Para receber um branch que só existe no repositório remoto utilize:</h5>
+                <ul>
+                    <li>git checkout --track origin/branch_name</li>
+                </ul>
+
+                <h5>Para dar pull nas mudanças feitas num branch, por outros desenvolvedores:</h5>
+                <ul>
+                    <li>git stash (Apenas se existirem arquivos modificados no repositório local que não tenham sido "commitados")</li>
+                    <li>git pull</li>
+                    <li>git stash pop (Caso o comando stash tenha sido utilizado)</li>
+                </ul>
+                <p>Caso hajam conflitos, resolva-os manualmente e então:</p>
+                <ul>
+                    <li>git reset</li>
+                    <li>git stash drop</li>
+                </ul>
+                <h5>Caso hajam conflitos no Merge:</h5>
+                <ul>
+                    <li>Resolva os conflitos manualmente</li>
+                    <li>git add nome_do_arquivo(para todos asquivos que tiveram conflitos)</li>
+                    <li>git commit -m "Merge branch 'branch_origem' into branch_destino"</li>
+                    <li>Continue com os comandos restantes</li>
+                </ul>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var gitgraph = new GitGraph({
+            template: "blackarrow",
+            mode: "compact"
+        });
+        var master = gitgraph.branch({
+            name: "master",
+            column: 3,
+            showLabel: true,
+            commitDefaultOptions: {
+                color: "#6BDB52"
+            }
+        })
+        master.commit();
+        var develop = master.branch({
+            name: "develop",
+            column: 0,
+            showLabel: true,
+            commitDefaultOptions: {
+                color: "#47E8D4"
+            }
+        });
+        develop.commit().commit().commit();
+        var feature = develop.branch({
+            name: "feature",
+            column: -1,
+            showLabel: true,
+            commitDefaultOptions: {
+                color: "#FF00FF"
+            }
+        });
+        feature.commit().commit();
+        feature.merge(develop);
+        var release = develop.branch({
+            name: "release/1.0.0",
+            clumn: 1,
+            showLabel: true,
+            commitDefaultOptions: {
+                color: "#E59C17"
+            }
+        });
+        develop.commit().commit();
+        release.commit().commit();
+        release.merge(master, { tag: "v1.0.0" });
+        release.merge(develop);
+        develop.commit().commit();
+        var hotfix = master.branch({
+            name: "hotfix/1.0.1",
+            column: 2,
+            showLabel: true,
+            commitDefaultOptions: {
+                color: "#FF0000"
+            }
+        });
+        hotfix.commit().commit();
+        hotfix.merge(master, { tag: "v1.0.1" });
+        hotfix.merge(develop);
+    </script>
+
+</body>
+
+</html>
